@@ -3,7 +3,7 @@
 
           <h1>Create new thread in <i>{{forum.name}}</i></h1>
 
-          <form @sumbit.prevent="save">
+          <form @submit.prevent="save">
               <div class="form-group">
                 <label for="thread_title">Title:</label>
                 <input v-model="title" type="text" id="thread_title" class="form-input" name="title">
@@ -15,7 +15,7 @@
               </div>
 
               <div class="btn-group">
-                <button class="btn btn-ghost">Cancel</button>
+                <button class="btn btn-ghost" @click.prevent="cancel">Cancel</button>
                 <button class="btn btn-blue" type="submit" name="Publish">Publish </button>
               </div>
           </form>
@@ -25,9 +25,9 @@
 <script>
 export default {
   props: {
-    forum: {
+    forumId: {
       required: true,
-      type: Object
+      type: String
     }
   },
   data () {
@@ -36,13 +36,23 @@ export default {
       text: ''
     }
   },
+  computed: {
+    forum () {
+      return this.$store.state.forums[this.forumId]
+    }
+  },
   methods: {
     save () {
       this.$store.dispatch('createThread', {
         forumId: this.forum['.key'],
         title: this.title,
         text: this.text
+      }).then(thread => {
+        this.$router.push({name: 'ThreadShow', params: {id: thread['.key']}})
       })
+    },
+    cancel () {
+      this.$router.push({name: 'Forum', params: {id: this.forum['.key']}})
     }
   }
 }

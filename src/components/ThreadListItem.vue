@@ -5,7 +5,7 @@
             <!-- <a :href="`/thread/${thread['.key']}`">{{thread.title}}</a>  
             <router-link :to="`/thread/${thread['.key']}`">        
             -->
-        <router-link :to="{name: 'threadShow', params:{id:thread['.key']}}">
+        <router-link :to="{name: 'ThreadShow', params:{id:thread['.key']}}">
           {{thread.title}}
         </router-link>
         </p>
