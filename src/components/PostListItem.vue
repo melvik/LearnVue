@@ -33,7 +33,7 @@
 
 <script>
 // import sourceData from '@/data'
-import {countObjectProperties} from '@/utils/index'
+// import {countObjectProperties} from '@/utils/index' >> using Dynamic getters
 import PostEditor from './PostEditor'
 
 export default {
@@ -56,7 +56,8 @@ export default {
       return this.$store.state.users[this.post.userId]
     },
     userPostCount () {
-      return countObjectProperties(this.user.posts)
+      return this.$store.getters.userPostsCount(this.post.userId)
+      // return countObjectProperties(this.user.posts)
       // return Object.keys(this.user.posts).length
     }
   }
