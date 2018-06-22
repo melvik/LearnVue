@@ -10,8 +10,8 @@
         </router-link>
       </h1>
         <p>
-          By <a href='#' class='link-unstyled'>Robin</a>, <AppDate :timestamp='thread.publishedAt'/>.
-          <span style='float:right; margin-top: 2px;' class='hide-mobile text-faded text-small'>3 replies by 3 contributors</span>
+          By <a href='#' class='link-unstyled'>{{user.name}}</a>, <AppDate :timestamp='thread.publishedAt'/>.
+          <span style='float:right; margin-top: 2px;' class='hide-mobile text-faded text-small'>{{repliesCount}} replies by {{contributorCount}} contributors</span>
         </p>
         <PostList :posts='posts'/>
         <PostEditor
@@ -48,6 +48,22 @@ export default {
       return Object.values(this.$store.state.posts).filter(post =>
         postIds.includes(post['.key'])
       )
+    },
+    repliesCount () {
+      return this.$store.getters.threadRepliesCount(this.thread['.key'])
+    },
+    user () {
+      return this.$store.state.users[this.thread.userId]
+    },
+    contributorCount () {
+      // find the replies
+      const replies = Object.keys(this.thread.posts)
+                      .filter(postId => postId !== this.thread.firstPostId)
+                      .map(postId => this.$store.state.posts[postId])
+      // get the user ids
+      const userId = replies.map(post => post.userId)
+      // count the unique ids
+      return userId.filter((item, index) => userId.indexOf(item) === index).length
     }
   }
   // methods: {

@@ -21,12 +21,10 @@
 export default {
   props: {
     title: {
-      required: true,
       type: String,
       default: ''
     },
     text: {
-      required: true,
       type: String,
       default: ''
     }

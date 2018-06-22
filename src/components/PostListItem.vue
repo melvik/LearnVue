@@ -6,9 +6,8 @@
                     <a href="#">
                         <img class="avatar-large" :src="user.avatar" alt="">
                     </a>
-
+                    <p class="desktop-only text-small">{{userThreadCount}} Threads</p>
                     <p class="desktop-only text-small">{{userPostCount}} posts</p>
-
         </div>
         <div class="post-content">
           <template v-if="!editing">
@@ -59,6 +58,9 @@ export default {
       return this.$store.getters.userPostsCount(this.post.userId)
       // return countObjectProperties(this.user.posts)
       // return Object.keys(this.user.posts).length
+    },
+    userThreadCount () {
+      return this.$store.getters.userThreadsCount(this.post.userId)
     }
   }
 }
