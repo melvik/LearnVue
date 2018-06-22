@@ -5,7 +5,7 @@
             <!-- <a :href="`/thread/${thread['.key']}`">{{thread.title}}</a>  
             <router-link :to="`/thread/${thread['.key']}`">        
             -->
-        <router-link :to="{name: 'threadShow', params:{id:thread['.key']}}">
+        <router-link :to="{name: 'ThreadShow', params:{id:thread['.key']}}">
           {{thread.title}}
         </router-link>
         </p>
@@ -34,7 +34,7 @@
 <script>
 // import sourceData from '@/data'
 // import AppDate from './AppDate'
-import {countObjectProperties} from '@/utils/index'
+// import {countObjectProperties} from '@/utils/index' >> removed using vuex.getters instead
 
 export default {
   // components: {
@@ -48,7 +48,8 @@ export default {
   },
   computed: {
     repliesCount () {
-      return countObjectProperties(this.thread.posts) - 1
+      return this.$store.getters.threadRepliesCount(this.thread['.key'])
+      // return countObjectProperties(this.thread.posts) - 1
       // return Object.keys(this.thread.posts).length - 1
     },
     user () {

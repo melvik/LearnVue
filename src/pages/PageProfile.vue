@@ -4,15 +4,11 @@
         <UserProfileCart 
           v-if="!edit"
           :user="user"
-          :userThreadsCount="userThreadsCount"
-          :userPostsCount="userPostsCount"
         />
 
         <UserProfileCartEditor
           v-else
           :user="user"
-          :userThreadsCount="userThreadsCount"
-          :userPostsCount="userPostsCount"
         />
           <div class="col-7 push-top">
 
@@ -59,7 +55,6 @@ import PostList from '@/components/PostList'
 import UserProfileCart from '@/components/UserProfileCart'
 import UserProfileCartEditor from '@/components/UserProfileCartEditor'
 import {mapGetters} from 'vuex'
-import {countObjectProperties} from '@/utils/index'
 
 export default {
   props: {
@@ -77,18 +72,21 @@ export default {
     ...mapGetters({
       user: 'authUser'
     }),
-    userThreadsCount () {
-      return countObjectProperties(this.user.threads)
-    //   return this.user.threads ^^moved
-    //   ? Object.keys(this.user.threads).length
-    //   : 0
-    },
-    userPostsCount () {
-      return countObjectProperties(this.user.posts)
-    //   return this.user.posts
-    //   ? Object.keys(this.user.posts).length
-    //   : 0
-    },
+    // moved to sub_cards as computed
+    // userThreadsCount () {
+    //   return this.$store.getters.userThreadsCount(this.user['.key'])
+    // // return countObjectProperties(this.user.threads)
+    // //   return this.user.threads ^^moved
+    // //   ? Object.keys(this.user.threads).length
+    // //   : 0
+    // },
+    // userPostsCount () {
+    //   return this.$store.getters.userPostsCount(this.user['.key'])
+    // //  return countObjectProperties(this.user.posts)
+    // //   return this.user.posts
+    // //   ? Object.keys(this.user.posts).length
+    // //   : 0
+    // },
     userPosts () {
       if (this.user.posts) {
         return Object.values(this.$store.state.posts)
