@@ -1,5 +1,5 @@
 <template>
-    <div class='col-large push-top'>
+    <div v-if="thread && user" class='col-large push-top'>
       <h1>{{thread.title}}
         <router-link
         :to="{name: 'ThreadEdit', id:this.id}"
@@ -21,8 +21,10 @@
     
 </template>
 <script>
+// import firebase from 'firebase'
 import PostList from '@/components/PostList'
 import PostEditor from '@/components/PostEditor'
+import {countObjectProperties} from '@/utils/index'
 export default {
   components: {
     PostList,
@@ -46,8 +48,7 @@ export default {
     posts () {
       const postIds = Object.values(this.thread.posts)
       return Object.values(this.$store.state.posts).filter(post =>
-        postIds.includes(post['.key'])
-      )
+        postIds.includes(post['.key']))
     },
     repliesCount () {
       return this.$store.getters.threadRepliesCount(this.thread['.key'])
@@ -56,16 +57,71 @@ export default {
       return this.$store.state.users[this.thread.userId]
     },
     contributorCount () {
-      // find the replies
-      const replies = Object.keys(this.thread.posts)
-                      .filter(postId => postId !== this.thread.firstPostId)
-                      .map(postId => this.$store.state.posts[postId])
-      // get the user ids
-      const userId = replies.map(post => post.userId)
-      // count the unique ids
-      return userId.filter((item, index) => userId.indexOf(item) === index).length
+      // // find the replies
+      // const replies = Object.keys(this.thread.posts)
+      //                 .filter(postId => postId !== this.thread.firstPostId)
+      //                 .map(postId => this.$store.state.posts[postId])
+      // // get the user ids
+      // const userId = replies.map(post => post.userId)
+      // // count the unique ids
+      // return userId.filter((item, index) => userId.indexOf(item) === index).length
+      return countObjectProperties(this.thread.contributors)
     }
+  },
+  beforeCreate () {
+    // this.id = undefined
+  },
+  created () {
+    // prototype
+    // fetch thread
+    // firebase.database().ref('threads').child(this.id).once('value', snapshot => {
+    //   const thread = snapshot.val()
+    //   this.$store.commit('setThread', {threadId: snapshot.key, thread: {...thread, '.key': snapshot.key}})
+    //   // fetch user
+    //   firebase.database().ref('users').child(thread.userId).once('value', snapshot => {
+    //     const user = snapshot.val()
+    //     this.$store.commit('setUser', {userId: snapshot.key, user: {...user, '.key': snapshot.key}})
+    //   })
+    //
+    //   Object.keys(thread.posts).forEach(postId => {
+    //     // fetch post
+    //     firebase.database().ref('posts').child(postId).once('value', snapshot => {
+    //       const post = snapshot.val()
+    //       this.$store.commit('setPost', {postId: snapshot.key, post: {...post, '.key': snapshot.key}})
+    //
+    //       // fetch user
+    //       firebase.database().ref('users').child(post.userId).once('value', snapshot => {
+    //         const user = snapshot.val()
+    //         this.$store.commit('setUser', {userId: snapshot.key, user: {...user, '.key': snapshot.key}})
+    //       })
+    //     })
+    //   })
+    // })
+
+    // fetch thread
+    this.$store.dispatch('fetchThread', {id: this.id})
+      .then(thread => {
+        // fetch user
+        this.$store.dispatch('fetchUser', {id: thread.userId})
+        this.$store.dispatch('fetchPosts', {ids: Object.keys(thread.posts)})
+        .then(posts => {
+          posts.forEach(post => {
+            this.$store.dispatch('fetchUser', {id: post.userId})
+          })
+        })
+
+        // REPLACED WITH fetchPosts
+        // Object.keys(thread.posts).forEach(postId => {
+        //   // fetch post
+        //   this.$store.dispatch('fetchPost', {id: postId})
+        //   .then(post => {
+        //     // fetch user
+        //     this.$store.dispatch('fetchUser', {id: post.userId})
+        //   })
+        // })
+      })
   }
+
   // methods: {
   //   addPost ({ post }) {
   //     // const postId = post['.key']

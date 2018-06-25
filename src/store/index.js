@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import sourceData from '@/data'
+// import sourceData from '@/data' >> using real DB
+import firebase from 'firebase'
 import {countObjectProperties} from '@/utils'
 Vue.use(Vuex)
 
@@ -15,12 +16,17 @@ const makeAppendChildToParrentMutation = ({parent, child}) =>
 
 export default new Vuex.Store({
   state: {
-    ...sourceData,
+    categories: {},
+    forums: {},
+    posts: {},
+    threads: {},
+    users: {},
     authId: 'jUjmgCurRRdzayqbRMO7aTG9X1G2'
   },
   getters: {
     authUser (state) {
-      return state.users[state.authId]
+      return {}
+      // return state.users[state.authId]
     },
     userThreadsCount: state => id => countObjectProperties(state.users[id].threads),
     userPostsCount: state => id => countObjectProperties(state.users[id].posts),
@@ -90,9 +96,77 @@ export default new Vuex.Store({
         commit('setPost', {post: newPost, postId: thread.firstPostId})
         resolve(newThread)
       })
+    },
+    fetchThread ({dispatch}, {id}) {
+      console.log('>> fetchThread >>', id)
+      return dispatch('fetchItem', {id, itemType: 'Thread', resource: 'threads'})
+      // return new Promise((resolve, reject) => {
+      //   firebase.database().ref('threads').child(id).once('value', snapshot => {
+      //     const thread = snapshot.val()
+      //     commit('setThread', {threadId: snapshot.key, thread: {...thread, '.key': snapshot.key}})
+      //     resolve(state.threads[id])
+      //   })
+      // })
+    },
+    fetchUser ({dispatch}, {id}) {
+      console.log('>> fetchUser >>', id)
+      return dispatch('fetchItem', {id, itemType: 'User', resource: 'users'})
+      // return new Promise((resolve, reject) => {
+      //   firebase.database().ref('users').child(id).once('value', snapshot => {
+      //     const user = snapshot.val()
+      //     commit('setUser', {userId: snapshot.key, user: {...user, '.key': snapshot.key}})
+      //     resolve(state.users[id])
+      //   })
+      // })
+    },
+    fetchPost ({dispatch}, {id}) {
+      console.log('>> fetchPost >>', id)
+      return dispatch('fetchItem', {id, itemType: 'Post', resource: 'posts'})
+      // return new Promise((resolve, reject) => {
+      //   firebase.database().ref('posts').child(id).once('value', snapshot => {
+      //     const post = snapshot.val()
+      //     commit('setPost', {postId: snapshot.key, post: {...post, '.key': snapshot.key}})
+      //     resolve(state.posts[id])
+      //   })
+      // })
+    },
+    fetchForums ({dispatch}, {ids}) {
+      return dispatch('fetchItems', {resource: 'forums', ids, itemType: '_Forum'})
+    },
+    fetchPosts ({dispatch}, {ids}) {
+      return dispatch('fetchItems', {resource: 'posts', ids, itemType: '_Post'})
+    },
+    fetchItem ({state, commit}, {id, itemType, resource}) {
+      console.log('>> fetchItem >>', itemType, id)
+      return new Promise((resolve, reject) => {
+        firebase.database().ref(resource).child(id).once('value', snapshot => {
+          commit('setItem', {resource, id: snapshot.key, item: snapshot.val()})
+          resolve(state[resource][id])
+        })
+      })
+    },
+    fetchItems ({dispatch}, {ids, resource, itemType}) {
+      return Promise.all(ids.map(id => dispatch('fetchItem', {id, resource, itemType})))
+    },
+    fetchAllCategories ({state, commit}) {
+      console.log('>> fetchAllCategories >>')
+      return new Promise((resolve, reject) => {
+        firebase.database().ref('categories').once('value', snapshot => {
+          const categoriesObject = snapshot.val()
+          Object.keys(categoriesObject).forEach(categoryId => {
+            const category = categoriesObject[categoryId]
+            commit('setItem', {resource: 'categories', id: categoryId, item: category})
+          })
+          resolve(Object.values(state.categories))
+        })
+      })
     }
   },
   mutations: {
+    setItem (state, {item, id, resource}) {
+      item['.key'] = id
+      Vue.set(state[resource], id, item)
+    },
     setThread (state, {thread, threadId}) {
       Vue.set(state.threads, threadId, thread)
     },

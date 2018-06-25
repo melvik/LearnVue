@@ -24,6 +24,30 @@ export default {
     categories () {
       return Object.values(this.$store.state.categories)
     }
+  },
+  beforeCreate () {
+    console.log('beforeCreate', this.categories)
+    this.$store.dispatch('fetchAllCategories')
+    .then(categories => {
+      categories.forEach(category => this.$store.dispatch('fetchForums', {ids: Object.keys(category.forums)}))
+    })
+  },
+  created () {
+    console.log('created', this.categories)
+  },
+  beforeMount () {
+    console.log('beforeMount', this.categories)
+  },
+  mounted () {
+    // = ready in JQ
+    console.log('Mount', this.categories, this.$el)
+  },
+  beforeDestroy () {
+    // turn off listeners like firebase
+    console.log('beforeDestroy', this.categories)
+  },
+  destroyed () {
+    console.log('Destroy', this.categories)
   }
   // data () {  data -> computed = best plactice
   //   return {
