@@ -1,5 +1,5 @@
 <template>
-    <div class="thread">
+    <div v-if="thread && user" class="thread">
     <div>
         <p>
             <!-- <a :href="`/thread/${thread['.key']}`">{{thread.title}}</a>  

@@ -12,6 +12,7 @@
 // import sourceData from '@/data.json'
 // import ThreadList from '@/components/ThreadList'
 // import ForumList from '@/components/ForumList'
+import {mapActions} from 'vuex'
 import CategoryList from '@/components/CategoryList'
 // console.log(sourceData)
 export default {
@@ -25,16 +26,20 @@ export default {
       return Object.values(this.$store.state.categories)
     }
   },
-  beforeCreate () {
-    console.log('beforeCreate', this.categories)
-    this.$store.dispatch('fetchAllCategories')
-    .then(categories => {
-      categories.forEach(category => this.$store.dispatch('fetchForums', {ids: Object.keys(category.forums)}))
-    })
+  methods: {
+    ...mapActions(['fetchAllCategories', 'fetchForums'])
   },
   created () {
-    console.log('created', this.categories)
+    // original beforeCreate - changed for vuex MapActions
+    console.log('beforeCreate', this.categories)
+    this.fetchAllCategories()
+    .then(categories => {
+      categories.forEach(category => this.fetchForums({ids: Object.keys(category.forums)}))
+    })
   },
+  // created () {
+  //   console.log('created', this.categories)
+  // },
   beforeMount () {
     console.log('beforeMount', this.categories)
   },
