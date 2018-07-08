@@ -34,6 +34,7 @@ export default {
   //   Vue.set(thread.posts, postId, postId)
   // // ^- this.$set(this.thread.posts, postId, postId)
   // },
+  appendContributorToThread: makeAppendChildToParrentMutation({parent: 'threads', child: 'contributors'}),
   appendPostToUser: makeAppendChildToParrentMutation({parent: 'users', child: 'posts'}),
   // ^^ replaced with higher order func
   // appendPostToUser (state, {postId, userId}) {
