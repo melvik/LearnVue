@@ -8,9 +8,11 @@
     "dev": "node build/dev-server.js",
     "start": "npm run dev",
     "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src"
+    "lint": "eslint --ext .js,.vue src",
+    "dbseed": "firebase database:set / src/data2.json"
   },
   "dependencies": {
+    "dotenv": "^6.0.0",
     "firebase": "^5.1.0",
     "moment": "^2.22.1",
     "nprogress": "^0.2.0",
