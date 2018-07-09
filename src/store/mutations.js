@@ -24,6 +24,9 @@ export default {
     Vue.set(state.posts, postId, post)
   // ^- replace this.$set(this.$store.state.posts, postId, post)
   },
+  setAuthId (state, id) {
+    state.authId = id
+  },
   appendPostToThread: makeAppendChildToParrentMutation({parent: 'threads', child: 'posts'}),
   // ^^ replaced with higher order func
   // appendPostToThread (state, {postId, threadId}) {
