@@ -103,8 +103,8 @@ export default {
     return firebase.auth().createUserWithEmailAndPassword(email, password)
     .then(user => {
       return dispatch('createUser', {id: user.user.uid, email, name, username, password, avatar})
-      .then(() => dispatch('fetchAuthUser'))
     })
+    .then(() => dispatch('fetchAuthUser'))
     // onAuthStateChanged in main.js is taking care of this .then(() => dispatch('fetchAuthUser'))
   },
   fetchAuthUser ({dispatch, commit}) {
