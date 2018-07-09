@@ -103,14 +103,46 @@ export default {
     return firebase.auth().createUserWithEmailAndPassword(email, password)
     .then(user => {
       return dispatch('createUser', {id: user.user.uid, email, name, username, password, avatar})
+      .then(() => dispatch('fetchAuthUser'))
     })
-    .then(() => dispatch('fetchAuthUser'))
+    // onAuthStateChanged in main.js is taking care of this .then(() => dispatch('fetchAuthUser'))
   },
   fetchAuthUser ({dispatch, commit}) {
     const userId = firebase.auth().currentUser.uid
-    return dispatch('fetchUser', {id: userId})
+    return new Promise((resolve, reject) => {
+      firebase.database().ref('users').child(userId).once('value', snapshot => {
+        if (snapshot.exists()) {
+          return dispatch('fetchUser', {id: userId})
+          .then(user => {
+            commit('setAuthId', userId)
+            resolve(user)
+          })
+        } else {
+          resolve(null)
+        }
+      })
+    })
+  },
+  signinWithEmailAndPassword (context, {email, password}) {
+    return firebase.auth().signInWithEmailAndPassword(email, password)
+  },
+  signinWithGoogle ({dispatch}) {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    return firebase.auth().signInWithPopup(provider)
+    .then(data => {
+      const user = data.user
+      firebase.database().ref('users').child(user.uid).once('value', snapshot => {
+        if (!snapshot.exists()) {
+          return dispatch('createUser', {id: user.uid, name: user.displayName, email: user.email, username: user.email, avatar: user.photoURL})
+          .then(() => dispatch('fetchAuthUser'))
+        }
+      })
+    })
+  },
+  signOut ({commit}) {
+    return firebase.auth().signOut()
     .then(() => {
-      commit('setAuthId', userId)
+      commit('setAuthId', null)
     })
   },
   updateThread ({state, commit}, {title, text, id}) {

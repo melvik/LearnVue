@@ -68,6 +68,9 @@ export default {
     UserProfileCart,
     UserProfileCartEditor
   },
+  created () {
+    this.$emit('ready')
+  },
   computed: {
     ...mapGetters({
       user: 'authUser'
