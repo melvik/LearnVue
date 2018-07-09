@@ -1,6 +1,6 @@
 <template>
 
-  <div v-if="ready" class="col-full push-top">
+  <div v-if="asyncDataStatus_ready" class="col-full push-top">
     <h1>Welcome to the Forum</h1>
     <!-- <ThreadList :threads="threads"/> -->
     <!-- <ForumList :forums="forums"/> -->
@@ -14,6 +14,7 @@
 // import ForumList from '@/components/ForumList'
 import {mapActions} from 'vuex'
 import CategoryList from '@/components/CategoryList'
+import asyncDataStatus from '@/mixins/asyncDataStatus'
 // console.log(sourceData)
 export default {
   components: {
@@ -21,11 +22,7 @@ export default {
     CategoryList
     // ThreadList
   },
-  data () {
-    return {
-      ready: false
-    }
-  },
+  mixins: [asyncDataStatus],
   computed: {
     categories () {
       return Object.values(this.$store.state.categories)
@@ -40,7 +37,7 @@ export default {
     this.fetchAllCategories()
     .then(categories => Promise.all(categories.map(category => this.fetchForums({ids: Object.keys(category.forums)})))
     .then(() => {
-      this.ready = true
+      this.asyncDataStatus_fetched()
     })
     )
   },

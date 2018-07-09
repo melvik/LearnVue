@@ -1,5 +1,5 @@
 <template>
-    <div v-if="forum" class="fullwidth">
+    <div v-if="asyncDataStatus_ready" class="fullwidth">
       <div class="col-full push-top">
           <div class="forum-header">
               <div class="forum-details">
@@ -53,6 +53,7 @@
 <script>
 import {mapActions} from 'vuex'
 import ThreadList from '@/components/ThreadList'
+import asyncDataStatus from '@/mixins/asyncDataStatus'
 // import sourceData from '@/data'
 export default {
   components: {
@@ -64,6 +65,7 @@ export default {
       type: String
     }
   },
+  mixins: [asyncDataStatus],
   computed: {
     forum () {
       return this.$store.state.forums[this.id]
@@ -78,13 +80,11 @@ export default {
   },
   created () {
     this.fetchForum({id: this.id})
-    .then(forum => {
-      console.log(forum.threads)
-      this.fetchThreads({ids: forum.threads})
-        .then(threads => {
-          threads.forEach(thread => this.fetchUser({id: thread.userId}))
-        })
-    })
+    .then(forum => this.fetchThreads({ids: forum.threads}))
+    .then(threads => Promise.all(threads.map(thread => this.fetchUser({id: thread.userId}))))
+    .then(() => this.asyncDataStatus_fetched())
+    // OLD: we changed forEach to map
+    // threads.forEach(thread => this.fetchUser({id: thread.userId}))
   }
 }
 </script>
