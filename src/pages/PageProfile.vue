@@ -11,7 +11,6 @@
           :user="user"
         />
           <div class="col-7 push-top">
-
               <div class="profile-header">
                   <span class="text-lead">
                       {{user.username}}'s recent activity
@@ -55,6 +54,7 @@ import PostList from '@/components/PostList'
 import UserProfileCart from '@/components/UserProfileCart'
 import UserProfileCartEditor from '@/components/UserProfileCartEditor'
 import {mapGetters} from 'vuex'
+// import store from '@/store'
 
 export default {
   props: {
@@ -97,6 +97,19 @@ export default {
       }
       return []
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    // if (store.state.authId) {
+    //   next()
+    // } else {
+    //   next({name: 'Home'}) // or next('/')
+    // }
+  },
+  beforeRouteUpdate (to, from, next) {
+    // ... not implimented
+  },
+  beforeRouteLeave (to, from, next) {
+    // ... not implimented
   }
 }
 </script>

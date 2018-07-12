@@ -3,7 +3,8 @@
 
           <h1>Create new thread in <i>{{forum.name}}</i></h1>
 
-          <ThreadEditor 
+          <ThreadEditor
+            ref="editor"
             @save="save"
             @cancel="cancel"
           />
@@ -25,6 +26,11 @@ export default {
       type: String
     }
   },
+  data () {
+    return {
+      saved: false
+    }
+  },
   mixins: [asyncDataStatus],
   // DATA removed with ThreadEditor
   // data () {
@@ -36,6 +42,9 @@ export default {
   computed: {
     forum () {
       return this.$store.state.forums[this.forumId]
+    },
+    hasUnsavedChanges () {
+      return (this.$refs.editor.form.title || this.$refs.editor.form.text) && !this.saved
     }
   },
   methods: {
@@ -46,6 +55,7 @@ export default {
         title,
         text
       }).then(thread => {
+        this.saved = true
         this.$router.push({name: 'ThreadShow', params: {id: thread['.key']}})
       })
     },
@@ -56,6 +66,19 @@ export default {
   created () {
     this.fetchForum({id: this.forumId})
     .then(() => this.asyncDataStatus_fetched())
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.hasUnsavedChanges) {
+      const confirmed = window.confirm('Are you sure ?')
+      if (confirmed) {
+        next()
+      } else {
+        next(false)
+      }
+    } else {
+      // no change
+      next()
+    }
   }
 }
 </script>
