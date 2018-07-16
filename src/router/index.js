@@ -44,19 +44,22 @@ const router = new Router({
       path: '/me/edit',
       name: 'ProfileEdit',
       component: Profile,
-      props: {edit: true}
+      props: {edit: true},
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/create/:forumId',
       name: 'ThreadCreate',
       component: ThreadCreate,
-      props: true
+      props: true,
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/:id/edit',
       name: 'ThreadEdit',
       component: ThreadEdit,
-      props: true
+      props: true,
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/:id',
@@ -67,16 +70,19 @@ const router = new Router({
     {
       path: '/register',
       name: 'Register',
+      meta: {requiresGuest: true},
       component: Register
     },
     {
       path: '/signin',
       name: 'SignIn',
+      meta: {requiresGuest: true},
       component: SignIn
     },
     {
       path: '/logout',
       name: 'SignOut',
+      meta: {requiresAuth: true},
       beforeEnter (to, from, next) {
         store.dispatch('signOut')
           .then(() => next({name: 'Home'}))
@@ -95,15 +101,24 @@ router.beforeEach((to, from, next) => {
   console.log(`Navigating to ${to.name} from ${from.name}`)
   // console.log(to.matched)
   // if (to.meta.requiresAuth) { OLD replaced with below
-  if (to.matched.some(route => route.meta.requiresAuth)) { // check nested routes too
-    if (store.state.authId) {
-      next()
+  store.dispatch('initAuthentication')
+  .then(user => {
+    if (to.matched.some(route => route.meta.requiresAuth)) { // check nested routes too
+      if (user) {
+        next()
+      } else {
+        next({name: 'SignIn', query: { redirectTo: to.path }})
+      }
+    } else if (to.matched.some(route => route.meta.requiresGuest)) { // check nested routes too
+      if (!user) {
+        next()
+      } else {
+        next({name: 'Home'}) // or next('/')
+      }
     } else {
-      next({name: 'Home'}) // or next('/')
+      next()
     }
-  } else {
-    next()
-  }
+  })
 })
 
 export default router

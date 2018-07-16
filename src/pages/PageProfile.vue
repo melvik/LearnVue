@@ -98,13 +98,13 @@ export default {
       return []
     }
   },
-  beforeRouteEnter (to, from, next) {
-    // if (store.state.authId) {
-    //   next()
-    // } else {
-    //   next({name: 'Home'}) // or next('/')
-    // }
-  },
+  // beforeRouteEnter (to, from, next) {
+  //   // if (store.state.authId) {
+  //   //   next()
+  //   // } else {
+  //   //   next({name: 'Home'}) // or next('/')
+  //   // }
+  // },
   beforeRouteUpdate (to, from, next) {
     // ... not implimented
   },
