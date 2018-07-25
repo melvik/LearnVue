@@ -71,9 +71,7 @@ export default {
   },
   mixins: [asyncDataStatus],
   created () {
-    console.log('posts', this.user.posts)
-    console.log('user', this.user)
-    this.$store.dispatch('fetchPosts', {ids: this.user.posts ? this.user.posts : ''})
+    this.$store.dispatch('fetchPosts', {ids: this.user.posts ? this.user.posts : []})
     .then(() => this.asyncDataStatus_fetched())
     // this.$emit('ready')
   },

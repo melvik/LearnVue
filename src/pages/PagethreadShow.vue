@@ -1,5 +1,6 @@
 <template>
     <div v-if="asyncDataStatus_ready  " class='col-large push-top'>
+      <!-- <router-link :to="{name: 'ThreadShow', params: {id: '-KvgjI6bfbWYlbYV5ndr'}}">linkkkk</router-link>  -->
       <h1>{{thread.title}}
         <router-link
         :to="{name: 'ThreadEdit', id:this.id}"
@@ -86,6 +87,7 @@ export default {
     // this.id = undefined
   },
   created () {
+    // console.log('show created *****')
     // prototype
     // fetch thread
     // firebase.database().ref('threads').child(this.id).once('value', snapshot => {
