@@ -11,7 +11,6 @@
           :user="user"
         />
           <div class="col-7 push-top">
-
               <div class="profile-header">
                   <span class="text-lead">
                       {{user.username}}'s recent activity
@@ -55,6 +54,8 @@ import PostList from '@/components/PostList'
 import UserProfileCart from '@/components/UserProfileCart'
 import UserProfileCartEditor from '@/components/UserProfileCartEditor'
 import {mapGetters} from 'vuex'
+import asyncDataStatus from '@/mixins/asyncDataStatus'
+// import store from '@/store'
 
 export default {
   props: {
@@ -68,8 +69,11 @@ export default {
     UserProfileCart,
     UserProfileCartEditor
   },
+  mixins: [asyncDataStatus],
   created () {
-    this.$emit('ready')
+    this.$store.dispatch('fetchPosts', {ids: this.user.posts ? this.user.posts : []})
+    .then(() => this.asyncDataStatus_fetched())
+    // this.$emit('ready')
   },
   computed: {
     ...mapGetters({
@@ -91,12 +95,27 @@ export default {
     // //   : 0
     // },
     userPosts () {
-      if (this.user.posts) {
-        return Object.values(this.$store.state.posts)
-          .filter(post => post.userId === this.user['.key'])
-      }
-      return []
+      // if (this.user.posts) {
+      //   return Object.values(this.$store.state.posts)
+      //     .filter(post => post.userId === this.user['.key'])
+      // }
+      // return []
+      // ^^ moved to getters
+      return this.$store.getters.userPosts(this.user['.key'])
     }
   }
+  // beforeRouteEnter (to, from, next) {
+  //   // if (store.state.authId) {
+  //   //   next()
+  //   // } else {
+  //   //   next({name: 'Home'}) // or next('/')
+  //   // }
+  // },
+  // beforeRouteUpdate (to, from, next) {
+  //   // ... not implimented
+  // },
+  // beforeRouteLeave (to, from, next) {
+  //   // ... not implimented
+  // }
 }
 </script>

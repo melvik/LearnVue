@@ -27,6 +27,9 @@ export default {
   setAuthId (state, id) {
     state.authId = id
   },
+  setUnsubescribeAuthObserver (state, unsubscribe) {
+    state.unsubescribeAuthObserver = unsubscribe
+  },
   appendPostToThread: makeAppendChildToParrentMutation({parent: 'threads', child: 'posts'}),
   // ^^ replaced with higher order func
   // appendPostToThread (state, {postId, threadId}) {

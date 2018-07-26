@@ -1,5 +1,6 @@
 <template>
     <div v-if="asyncDataStatus_ready  " class='col-large push-top'>
+      <!-- <router-link :to="{name: 'ThreadShow', params: {id: '-KvgjI6bfbWYlbYV5ndr'}}">linkkkk</router-link>  -->
       <h1>{{thread.title}}
         <router-link
         :to="{name: 'ThreadEdit', id:this.id}"
@@ -15,14 +16,19 @@
         </p>
         <PostList :posts='posts'/>
         <PostEditor
+          v-if="authUser"
           :threadId='id'
         />
+      <div v-else class="text-center" style="margin-buttom: 50px;">
+        <router-link :to="{name: 'SignIn', query: {redirectTo: $route.path}}">Sign in</router-link> or 
+        <router-link :to="{name: 'Register', query: {redirectTo: $route.path}}">Register</router-link> to post a reply.
+      </div>
     </div>
     
 </template>
 <script>
 // import firebase from 'firebase'
-import {mapActions} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 import PostList from '@/components/PostList'
 import PostEditor from '@/components/PostEditor'
 import {countObjectProperties} from '@/utils/index'
@@ -45,6 +51,9 @@ export default {
   //   }
   // },
   computed: {
+    ...mapGetters({
+      authUser: 'authUser'
+    }),
     thread () {
       return this.$store.state.threads[this.id]
     },
@@ -78,6 +87,7 @@ export default {
     // this.id = undefined
   },
   created () {
+    // console.log('show created *****')
     // prototype
     // fetch thread
     // firebase.database().ref('threads').child(this.id).once('value', snapshot => {

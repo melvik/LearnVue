@@ -1,4 +1,5 @@
 import firebase from 'firebase'
+import {removeEmptyProperties} from '@/utils'
 
 export default {
   createPost ({ commit, state }, post) {
@@ -38,7 +39,22 @@ export default {
     })
   },
   updateUser ({commit}, user) {
-    commit('setUser', {userId: user['.key'], user})
+    const updates = {
+      avatar: user.avatar,
+      username: user.username,
+      name: user.name,
+      bio: user.bio,
+      website: user.website,
+      email: user.email,
+      location: user.location
+    }
+    return new Promise((resolve, reject) => {
+      firebase.database().ref('users').child(user['.key']).update(removeEmptyProperties(updates))
+      .then(() => {
+        commit('setUser', {userId: user['.key'], user})
+        resolve(user)
+      })
+    })
   },
   createThread ({ state, commit, dispatch }, { text, title, forumId }) {
     return new Promise((resolve, reject) => {
@@ -107,6 +123,25 @@ export default {
     .then(() => dispatch('fetchAuthUser'))
     // onAuthStateChanged in main.js is taking care of this .then(() => dispatch('fetchAuthUser'))
   },
+
+  initAuthentication ({dispatch, commit, state}) {
+    return new Promise((resolve, reject) => {
+      if (state.unsubescribeAuthObserver) {
+        state.unsubescribeAuthObserver()
+      }
+      const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+        console.log('user has changed')
+        if (user) {
+          dispatch('fetchAuthUser')
+          .then((dbUser) => resolve(dbUser))
+        } else {
+          resolve(null)
+        }
+      })
+      commit('setUnsubescribeAuthObserver', unsubscribe)
+    })
+  },
+
   fetchAuthUser ({dispatch, commit}) {
     const userId = firebase.auth().currentUser.uid
     return new Promise((resolve, reject) => {
@@ -182,8 +217,8 @@ export default {
     return new Promise((resolve, reject) => {
       firebase.database().ref(resource).child(id).once('value', snapshot => {
         commit('setItem', {resource, id: snapshot.key, item: snapshot.val()})
-        // resolve(state[resource][id])
-        setTimeout(() => resolve(state[resource][id]), 1000)
+        resolve(state[resource][id])
+        // setTimeout(() => resolve(state[resource][id]), 100)
       })
     })
   },

@@ -4,6 +4,7 @@
           <h1>Editing <i>{{thread.title}}</i></h1>
 
           <ThreadEditor 
+            ref="editor"
             :title="thread.title"
             :text="text"
             @save="save"
@@ -27,6 +28,11 @@ export default {
       type: String
     }
   },
+  data () {
+    return {
+      saved: false
+    }
+  },
   mixins: [asyncDataStatus],
   computed: {
     thread () {
@@ -35,6 +41,10 @@ export default {
     text () {
       const post = this.$store.state.posts[this.thread.firstPostId]
       return post ? post.text : null
+    },
+    dataHasNotChanged () {
+      // const thread = thread
+      return ((this.$refs.editor.form.title && this.$refs.editor.form.title !== this.thread.title) || (this.$refs.editor.form.text !== this.text)) && !this.saved
     }
   },
   methods: {
@@ -46,6 +56,7 @@ export default {
         title,
         text
       }).then(thread => {
+        this.saved = true
         this.$router.push({name: 'ThreadShow', params: {id: this.id}})
       })
     },
@@ -58,6 +69,18 @@ export default {
     this.$store.dispatch('fetchThread', {id: this.id})
       .then(thread => this.fetchPost({id: thread.firstPostId}))
       .then(() => this.asyncDataStatus_fetched())
+  },
+  beforeRouteLeave (to, from, next) {
+    if (this.dataHasNotChanged) {
+      const confirmed = window.confirm('sure ?')
+      if (confirmed) {
+        next()
+      } else {
+        next(false)
+      }
+    } else {
+      next()
+    }
   }
 }
 </script>

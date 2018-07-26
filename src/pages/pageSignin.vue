@@ -46,13 +46,17 @@ export default {
         email: this.form.email,
         password: this.form.password
       })
-      .then(() => this.$router.push('/'))
+      .then(() => this.successRedirect())
       .catch(error => alert(error.message))
     },
     signInWithGoogle () {
       this.$store.dispatch('signinWithGoogle')
-      .then(() => this.$router.push('/'))
+      .then(() => this.successRedirect())
       .catch(error => alert(error.message))
+    },
+    successRedirect () {
+      const redirectTo = this.$route.query.redirectTo || {name: 'Home'} // $route (ACTIVE route) !== $router (Global router instance)
+      this.$router.push(redirectTo)
     }
   },
   created () {

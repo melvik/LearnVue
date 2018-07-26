@@ -10,10 +10,11 @@ import NotFound from '@/pages/PageNotFound'
 import Profile from '@/pages/PageProfile'
 import Register from '@/pages/PageRegister'
 import SignIn from '@/pages/PageSignin'
+import store from '@/store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -36,25 +37,29 @@ export default new Router({
       path: '/me',
       name: 'Profile',
       component: Profile,
-      props: true
+      props: true,
+      meta: {requiresAuth: true}
     },
     {
       path: '/me/edit',
       name: 'ProfileEdit',
       component: Profile,
-      props: {edit: true}
+      props: {edit: true},
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/create/:forumId',
       name: 'ThreadCreate',
       component: ThreadCreate,
-      props: true
+      props: true,
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/:id/edit',
       name: 'ThreadEdit',
       component: ThreadEdit,
-      props: true
+      props: true,
+      meta: {requiresAuth: true}
     },
     {
       path: '/thread/:id',
@@ -65,18 +70,55 @@ export default new Router({
     {
       path: '/register',
       name: 'Register',
+      meta: {requiresGuest: true},
       component: Register
     },
     {
       path: '/signin',
       name: 'SignIn',
+      meta: {requiresGuest: true},
       component: SignIn
+    },
+    {
+      path: '/logout',
+      name: 'SignOut',
+      meta: {requiresAuth: true},
+      beforeEnter (to, from, next) {
+        store.dispatch('signOut')
+          .then(() => next({name: 'Home'}))
+      }
     },
     {
       path: '*',
       name: 'NotFound',
       component: NotFound
     }
-  ],
-  mode: 'history'
+  ]
+  // mode: 'history'
 })
+
+router.beforeEach((to, from, next) => {
+  console.log(`Navigating to ${to.name} from ${from.name}`)
+  // console.log(to.matched)
+  // if (to.meta.requiresAuth) { OLD replaced with below
+  store.dispatch('initAuthentication')
+  .then(user => {
+    if (to.matched.some(route => route.meta.requiresAuth)) { // check nested routes too
+      if (user) {
+        next()
+      } else {
+        next({name: 'SignIn', query: { redirectTo: to.path }})
+      }
+    } else if (to.matched.some(route => route.meta.requiresGuest)) { // check nested routes too
+      if (!user) {
+        next()
+      } else {
+        next({name: 'Home'}) // or next('/')
+      }
+    } else {
+      next()
+    }
+  })
+})
+
+export default router
