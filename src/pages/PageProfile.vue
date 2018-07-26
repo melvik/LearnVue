@@ -103,7 +103,7 @@ export default {
       // ^^ moved to getters
       return this.$store.getters.userPosts(this.user['.key'])
     }
-  },
+  }
   // beforeRouteEnter (to, from, next) {
   //   // if (store.state.authId) {
   //   //   next()
@@ -111,11 +111,11 @@ export default {
   //   //   next({name: 'Home'}) // or next('/')
   //   // }
   // },
-  beforeRouteUpdate (to, from, next) {
-    // ... not implimented
-  },
-  beforeRouteLeave (to, from, next) {
-    // ... not implimented
-  }
+  // beforeRouteUpdate (to, from, next) {
+  //   // ... not implimented
+  // },
+  // beforeRouteLeave (to, from, next) {
+  //   // ... not implimented
+  // }
 }
 </script>
