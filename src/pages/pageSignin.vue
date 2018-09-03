@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     signIn () {
-      this.$store.dispatch('signinWithEmailAndPassword', {
+      this.$store.dispatch('auth/signinWithEmailAndPassword', {
         email: this.form.email,
         password: this.form.password
       })
@@ -50,7 +50,7 @@ export default {
       .catch(error => alert(error.message))
     },
     signInWithGoogle () {
-      this.$store.dispatch('signinWithGoogle')
+      this.$store.dispatch('auth/signinWithGoogle')
       .then(() => this.successRedirect())
       .catch(error => alert(error.message))
     },

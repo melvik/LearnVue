@@ -101,7 +101,7 @@ router.beforeEach((to, from, next) => {
   console.log(`Navigating to ${to.name} from ${from.name}`)
   // console.log(to.matched)
   // if (to.meta.requiresAuth) { OLD replaced with below
-  store.dispatch('initAuthentication')
+  store.dispatch('auth/initAuthentication')
   .then(user => {
     if (to.matched.some(route => route.meta.requiresAuth)) { // check nested routes too
       if (user) {

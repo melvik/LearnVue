@@ -36,10 +36,10 @@ export default {
   mixins: [asyncDataStatus],
   computed: {
     thread () {
-      return this.$store.state.threads[this.id]
+      return this.$store.state.threads.items[this.id]
     },
     text () {
-      const post = this.$store.state.posts[this.thread.firstPostId]
+      const post = this.$store.state.posts.items[this.thread.firstPostId]
       return post ? post.text : null
     },
     dataHasNotChanged () {
@@ -48,7 +48,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['updateThread', 'fetchPost', 'fetchThread']),
+    ...mapActions('threads', ['updateThread', 'fetchThread']),
+    ...mapActions('posts', ['fetchPost']),
     save ({title, text}) {
       // ORIGINAL >> this.$store.dispatch('updateThread', {
       this.updateThread({
@@ -66,7 +67,7 @@ export default {
   },
   created () {
     // OROGINAL this.$store.dispatch('fetchThread', {id: this.id})
-    this.$store.dispatch('fetchThread', {id: this.id})
+    this.fetchThread({id: this.id})
       .then(thread => this.fetchPost({id: thread.firstPostId}))
       .then(() => this.asyncDataStatus_fetched())
   },

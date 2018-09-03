@@ -71,13 +71,13 @@ export default {
   },
   mixins: [asyncDataStatus],
   created () {
-    this.$store.dispatch('fetchPosts', {ids: this.user.posts ? this.user.posts : []})
+    this.$store.dispatch('posts/fetchPosts', {ids: this.user.posts})
     .then(() => this.asyncDataStatus_fetched())
     // this.$emit('ready')
   },
   computed: {
     ...mapGetters({
-      user: 'authUser'
+      user: 'auth/authUser'
     }),
     // moved to sub_cards as computed
     // userThreadsCount () {
@@ -101,7 +101,7 @@ export default {
       // }
       // return []
       // ^^ moved to getters
-      return this.$store.getters.userPosts(this.user['.key'])
+      return this.$store.getters['users/userPosts'](this.user['.key'])
     }
   }
   // beforeRouteEnter (to, from, next) {

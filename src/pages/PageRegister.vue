@@ -57,11 +57,11 @@ export default {
   },
   methods: {
     register () {
-      this.$store.dispatch('registerUserWithEmailandPassword', this.form)
+      this.$store.dispatch('auth/registerUserWithEmailandPassword', this.form)
       .then(() => this.$router.push('/'))
     },
     registerWithGoogle () {
-      this.$store.dispatch('signinWithGoogle')
+      this.$store.dispatch('auth/signinWithGoogle')
       .then(() => this.$router.push('/'))
     }
   },
